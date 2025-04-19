@@ -5,5 +5,8 @@
         "/home/divo/.vscode-server/extensions/antoinebalaine.reascript-docs-0.1.12/resources/Sexan_reaper_defs.lua",
         "/home/divo/.vscode-server/extensions/antoinebalaine.reascript-docs-0.1.12/resources/imgui_defs_0.9.lua",
         "/home/divo/.vscode-server/extensions/antoinebalaine.reascript-docs-0.1.12/resources/reawwise_defs.lua"
+    ],
+    "Lua.diagnostics.globals": [
+        "reaper"
     ]
 }
