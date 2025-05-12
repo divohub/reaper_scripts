@@ -18,60 +18,45 @@ function parse_sample_name(name)
   local instrument = ""
   local characteristic = ""
 
-  -- Список известных инструментов
   local known_instruments = {
-    -- Drums & Percussion
     "kick", "snare", "rim", "clap", "hats", "hat", "cymbal", "crash", "ride", "tom", "toms",
     "perc", "percussion", "shaker", "conga", "bongo", "timbale", "cowbell", "drums", "drumloop",
-  
-    -- Bass
     "bass", "sub", "808", "reese", "lowend",
-  
-    -- Synths & Keys
     "synth", "lead", "pad", "pluck", "arp", "keys", "piano", "epiano", "rhodes", "organ", "bell", "chord", "melody", "melodic", "synthloop",
-  
-    -- Guitars & Strings
-    "guitar", "electric", "acoustic", "pluck", "strum", "riff", "strings", "violin", "cello", "harp",
-  
-    -- Brass & Wind
+    "guitar", "electric", "acoustic", "strum", "riff", "strings", "violin", "cello", "harp",
     "brass", "trumpet", "trombone", "sax", "saxophone", "flute", "horn",
-  
-    -- FX & One-Shots
     "fx", "impact", "transition", "sweep", "rise", "drop", "glitch", "noise", "texture", "cinematic", "hit", "boom", "whoosh", "drone",
-  
-    -- Vocals
     "vocal", "vox", "chant", "phrase", "shout", "adlib", "hook", "acapella", "speech", "choir", "talk", "sing",
-  
-    -- World & Organic
     "kalimba", "koto", "sitar", "banjo", "dulcimer", "djembe", "tabla", "didgeridoo", "flamenco", "ethnic", "folk", "world",
-  
-    -- Genre/Usage Specific
     "loop", "one", "oneshot", "top", "beat", "groove", "stem", "sample", "dry", "wet"
   }
-  
-  -- Ищем инструмент
-  for i = 2, #parts do
-    for _, keyword in ipairs(known_instruments) do
-      if parts[i]:lower():find(keyword) then
-        if parts[i+1] and parts[i+1]:match("^[a-z]+$") then
-          instrument = parts[i] .. " " .. parts[i+1]
-        else
-          instrument = parts[i]
-        end
-        break
-      end
+
+  local function is_instrument(word)
+    for _, instr in ipairs(known_instruments) do
+      if word:lower():find(instr) then return true end
     end
-    if instrument ~= "" then break end
+    return false
   end
 
-  -- Характеристика звука (последнее осмысленное слово)
-  for i = #parts, 2, -1 do
-    if not parts[i]:match("^[A-G]#?b?$") and not tonumber(parts[i]) then
-      characteristic = parts[i]
+  -- Ищем инструмент
+  for i = 2, #parts do
+    if is_instrument(parts[i]) then
+      if parts[i+1] and is_instrument(parts[i+1]) then
+        instrument = parts[i] .. " " .. parts[i+1]
+      else
+        instrument = parts[i]
+      end
       break
     end
   end
 
+  -- Ищем характеристику (первое неинструментальное слово)
+  for i = 2, #parts do
+    if not is_instrument(parts[i]) and not tonumber(parts[i]) and not parts[i]:match("^[A-G]#?b?$") then
+      characteristic = parts[i]
+      break
+    end
+  end
   return capitalize_words(instrument), capitalize_words(characteristic), capitalize_words(label)
 end
 
