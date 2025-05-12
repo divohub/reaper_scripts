@@ -38,25 +38,31 @@ function parse_sample_name(name)
     return false
   end
 
-  -- Ищем инструмент
+  local instrument_index = nil
+
+  -- Сначала находим инструмент и его индекс
   for i = 2, #parts do
     if is_instrument(parts[i]) then
-      if parts[i+1] and is_instrument(parts[i+1]) then
-        instrument = parts[i] .. " " .. parts[i+1]
-      else
-        instrument = parts[i]
-      end
+      instrument = parts[i]
+      instrument_index = i
       break
     end
   end
-
-  -- Ищем характеристику (первое неинструментальное слово)
-  for i = 2, #parts do
-    if not is_instrument(parts[i]) and not tonumber(parts[i]) and not parts[i]:match("^[A-G]#?b?$") then
+  
+  -- Если инструмент не найден — по умолчанию "Sample"
+  if not instrument_index then
+    instrument = "Sample"
+    instrument_index = 2  -- начинаем поиск характеристики с 3-го слова
+  end
+  
+  -- Ищем характеристику после инструмента
+  for i = instrument_index + 1, #parts do
+    if not is_instrument(parts[i]) and not parts[i]:find("%d") then
       characteristic = parts[i]
       break
     end
   end
+  
   return capitalize_words(instrument), capitalize_words(characteristic), capitalize_words(label)
 end
 
